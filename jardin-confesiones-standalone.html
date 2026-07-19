@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jardín de Confesiones</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Nunito:wght@400;600;700&display=swap');
+
+:root{
+  --night-1:#161a33;
+  --night-2:#2b2757;
+  --cream:#f7ecd8;
+  --gold:#f0d68c;
+  --pink:#e8b4c8;
+  --lavender:#c9b6f0;
+  --sage:#a8cfa0;
+  --blue-grey:#93a8c9;
+  --olive:#8f9b5c;
+  --coral:#e2836b;
+  --white-flower:#f4f1e8;
+  --panel-bg:rgba(22,26,51,.76);
+  --panel-border:rgba(247,236,216,.16);
+  --radius-lg:28px;
+  --radius-md:16px;
+  font-size:16px;
+}
+
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:'Nunito','Segoe UI',sans-serif;
+  color:var(--cream);
+  overflow-x:hidden;
+  position:relative;
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  background-attachment:fixed;
+  transition:background-image .45s ease;
+}
+
+body.fondo-inicio{
+  background-image:url("Bienvenido al Jardín de Confesiones.png");
+}
+
+body.fondo-jardin{
+  background-image:url("jardinn.png");
+}
+
+h1,h2,h3,.prompt-bubble,.section-sub,.stat-card strong,.stat-inline strong{
+  font-family:'Caveat','Segoe Print','Comic Sans MS',cursive;
+  font-weight:700;
+  letter-spacing:.5px;
+}
+
+/* Fondo animado */
+.night-sky{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  overflow:hidden;
+}
+
+.stars{
+  position:absolute;
+  inset:0;
+  background-image:
+    radial-gradient(1.5px 1.5px at 20% 20%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 60% 10%, #fff, transparent),
+    radial-gradient(1px 1px at 80% 30%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 30% 60%, #fff, transparent),
+    radial-gradient(1px 1px at 90% 70%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 45% 85%, #fff, transparent),
+    radial-gradient(1px 1px at 15% 45%, #fff, transparent);
+  opacity:.35;
+}
+
+.firefly{
+  position:absolute;
+  width:5px;
+  height:5px;
+  border-radius:50%;
+  background:var(--gold);
+  box-shadow:0 0 8px 3px rgba(240,214,140,.8);
+  animation:float 8s ease-in-out infinite, twinkle 3s ease-in-out infinite;
+}
+
+@keyframes float{
+  0%,100%{transform:translateY(0) translateX(0);}
+  50%{transform:translateY(-30px) translateX(15px);}
+}
+
+@keyframes twinkle{
+  0%,100%{opacity:.25;}
+  50%{opacity:1;}
+}
+
+/* Transición de entrada */
+.garden-transition{
+  position:fixed;
+  inset:0;
+  z-index:100;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  background-image:url("jardinn.png");
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  opacity:0;
+}
+
+.garden-transition.active{
+  display:flex;
+  animation:transitionScene 2s ease forwards;
+}
+
+.garden-transition::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:#fff;
+  opacity:0;
+  animation:flashLight 2s ease forwards;
+}
+
+.garden-transition::after{
+  content:"Entrando al jardín…";
+  position:relative;
+  z-index:2;
+  color:white;
+  font-family:'Caveat',cursive;
+  font-size:clamp(2rem,5vw,4rem);
+  text-shadow:0 3px 18px rgba(0,0,0,.8);
+  opacity:0;
+  animation:transitionText 4s ease forwards;
+}
+
+@keyframes transitionScene{
+  0%{opacity:0; transform:scale(1.05);}
+  18%{opacity:1;}
+  82%{opacity:1; transform:scale(1);}
+  100%{opacity:0; transform:scale(1);}
+}
+
+@keyframes flashLight{
+  0%{opacity:0;}
+  12%{opacity:.95;}
+  32%{opacity:.28;}
+  70%{opacity:0;}
+  100%{opacity:0;}
+}
+
+@keyframes transitionText{
+  0%,28%{opacity:0; transform:translateY(12px);}
+  45%,76%{opacity:1; transform:translateY(0);}
+  100%{opacity:10;}
+}
+
+/* Layout */
+.view{
+  display:none;
+  position:relative;
+  z-index:1;
+  min-height:100vh;
+  padding:32px 20px 110px;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+}
+
+.view.active{display:flex;}
+
+.panel{
+  width:100%;
+  max-width:480px;
+  background:var(--panel-bg);
+  border:1px solid var(--panel-border);
+  border-radius:var(--radius-lg);
+  padding:32px 26px;
+  backdrop-filter:blur(7px);
+  text-align:center;
+  position:relative;
+  animation:fadeUp .5s ease;
+}
+
+.panel.wide{
+  max-width:720px;
+  text-align:left;
+}
+
+@keyframes fadeUp{
+  from{opacity:0; transform:translateY(14px);}
+  to{opacity:1; transform:translateY(0);}
+}
+
+.step.hidden{display:none;}
+
+h2{font-size:2rem; margin:0 0 12px;}
+.lead{font-size:1.05rem; line-height:1.5; color:var(--cream); opacity:.9;}
+.muted{opacity:.65; font-family:'Nunito',sans-serif; font-size:.9rem;}
+.section-sub{font-size:1.5rem; margin:22px 0 10px;}
+.mt{margin-top:36px;}
+
+/* Botones */
+.btn{
+  font-family:'Nunito',sans-serif;
+  font-weight:700;
+  font-size:1rem;
+  border:none;
+  border-radius:999px;
+  cursor:pointer;
+  padding:13px 28px;
+  margin:8px 6px 0;
+  transition:transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+}
+
+.btn:active{transform:scale(.96);}
+
+.btn-primary{
+  background:#fff;
+  color:#2b2757;
+  border:none;
+  border-radius:40px;
+  padding:15px 45px;
+  font-size:1.15rem;
+  font-weight:700;
+  box-shadow:0 8px 25px rgba(0,0,0,.25);
+}
+
+.btn-primary:hover{
+  transform:translateY(-3px);
+  box-shadow:0 15px 30px rgba(0,0,0,.35);
+  background:#fafafa;
+}
+
+.btn-primary:disabled{
+  opacity:.4;
+  cursor:not-allowed;
+  box-shadow:none;
+}
+
+.btn-link{
+  background:none;
+  color:#fff;
+  opacity:.85;
+  text-decoration:none;
+  padding:8px 12px;
+  font-size:1rem;
+  text-shadow:0 2px 6px rgba(0,0,0,.8);
+}
+
+.btn-link:hover{
+  opacity:1;
+  transform:translateY(-1px);
+}
+
+.btn-ghost{
+  background:rgba(247,236,216,.08);
+  color:var(--cream);
+  border:1px solid var(--panel-border);
+}
+
+.btn-back{
+  position:absolute;
+  top:18px;
+  left:18px;
+  background:rgba(247,236,216,.1);
+  border:none;
+  color:var(--cream);
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  cursor:pointer;
+  font-size:1.1rem;
+}
+
+/* Inicio */
+.hero{
+  text-align:center;
+  width:100%;
+  max-width:620px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:16px;
+  transform:translateY(125px);
+}
+
+.hero-tag{
+  margin:0 0 18px;
+  font-size:1.15rem;
+  color:#fff;
+  font-weight:600;
+  opacity:.85;
+  text-shadow:0 2px 5px rgba(0,0,0,.9), 0 0 12px rgba(0,0,0,.7);
+}
+
+/* Cards */
+.card-row{
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+  justify-content:center;
+  margin:18px 0;
+}
+
+.info-card,.stat-card{
+  flex:1 1 140px;
+  background:rgba(247,236,216,.06);
+  border:1px solid var(--panel-border);
+  border-radius:var(--radius-md);
+  padding:16px 12px;
+  text-align:center;
+}
+
+.info-icon{font-size:1.6rem;}
+.info-card h3{font-size:1.3rem; margin:6px 0 4px;}
+.info-card p{font-size:.85rem; opacity:.8; line-height:1.4; margin:0;}
+.stat-card{display:flex; flex-direction:column; gap:4px;}
+.stat-card strong{font-size:2rem; color:var(--gold);}
+.stat-card span{font-size:.8rem; opacity:.8;}
+.rules{text-align:left; line-height:1.7; font-size:.92rem; opacity:.9; padding-left:20px;}
+
+/* Sembrar */
+.prompt-bubble{
+  background:rgba(247,236,216,.08);
+  border:1px solid var(--panel-border);
+  border-radius:var(--radius-md);
+  padding:22px;
+  font-size:1.6rem;
+  margin:18px 0;
+}
+
+textarea{
+  width:100%;
+  min-height:110px;
+  border-radius:var(--radius-md);
+  border:1px solid var(--panel-border);
+  background:rgba(247,236,216,.06);
+  color:var(--cream);
+  font-family:'Nunito',sans-serif;
+  font-size:1rem;
+  padding:14px;
+  resize:vertical;
+}
+
+textarea:focus{outline:1.5px solid var(--gold);}
+.char-count{text-align:right; font-size:.75rem; opacity:.6; margin:4px 2px 0;}
+
+.emotion-picker{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  justify-content:center;
+  margin:14px 0;
+}
+
+.emotion-chip{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+  width:72px;
+  padding:10px 6px;
+  border-radius:14px;
+  cursor:pointer;
+  border:1.5px solid transparent;
+  background:rgba(247,236,216,.05);
+  font-size:.75rem;
+  transition:all .15s ease;
+}
+
+.emotion-chip.selected{
+  border-color:var(--gold);
+  background:rgba(240,214,140,.14);
+  transform:translateY(-2px);
+}
+
+.emotion-flower{
+  width:38px;
+  height:38px;
+  object-fit:contain;
+  display:block;
+  transition:transform .2s ease, filter .2s ease;
+}
+
+.card-flower{
+  width:52px;
+  height:52px;
+  margin:0 auto 8px;
+}
+
+.modal-flower-image{
+  width:90px;
+  height:90px;
+  margin:0 auto 12px;
+}
+
+.emotion-chip.selected .emotion-flower{
+  transform:scale(1.15);
+  filter:drop-shadow(0 0 8px rgba(255,255,255,.45));
+}
+
+/* Imagen de siembra */
+.seed-animation{
+  width:min(280px,85%);
+  height:auto;
+  display:block;
+  margin:0 auto 22px;
+  border-radius:14px;
+  animation:growSeed 1.4s ease;
+}
+
+@keyframes growSeed{
+  0%{opacity:0; transform:scale(.5) translateY(30px);}
+  60%{transform:scale(1.08);}
+  100%{opacity:1; transform:scale(1);}
+}
+
+/* Explorar */
+.filter-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:14px 0 20px;
+}
+
+.filter-chip{
+  padding:7px 14px;
+  border-radius:999px;
+  font-size:.82rem;
+  cursor:pointer;
+  border:1px solid var(--panel-border);
+  background:rgba(247,236,216,.05);
+  color:var(--cream);
+}
+
+.filter-chip.active{
+  background:var(--gold);
+  color:#2a1e12;
+  border-color:var(--gold);
+  font-weight:700;
+}
+
+.confession-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+  gap:14px;
+}
+
+.confession-card{
+  background:rgba(247,236,216,.06);
+  border:1px solid var(--panel-border);
+  border-radius:var(--radius-md);
+  padding:14px;
+  cursor:pointer;
+  text-align:center;
+  transition:transform .15s ease;
+}
+
+.confession-card:hover{transform:translateY(-3px);}
+
+.confession-card p{
+  font-size:.8rem;
+  opacity:.85;
+  margin:0;
+  line-height:1.3;
+  display:-webkit-box;
+  -webkit-line-clamp:3;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+
+/* Mapa de México */
+.map-box{
+  width:100%;
+  margin:22px 0;
+}
+
+.mexico-map-container{
+  position:relative;
+  width:100%;
+  max-width:680px;
+  margin:0 auto;
+  overflow:hidden;
+  border-radius:24px;
+  background:rgba(8,18,45,.35);
+  border:1px solid rgba(255,255,255,.14);
+}
+
+.mexico-map-image{
+  display:block;
+  width:100%;
+  height:auto;
+  opacity:.95;
+  filter:drop-shadow(0 10px 24px rgba(0,0,0,.35)) brightness(1.15);
+}
+
+.map-points{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+}
+
+.seed-map-point{
+  position:absolute;
+  width:13px;
+  height:13px;
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  background:#f7dc83;
+  box-shadow:
+    0 0 7px 2px rgba(247,220,131,.95),
+    0 0 18px 7px rgba(247,220,131,.35);
+  animation:
+    seedPointAppear .7s ease forwards,
+    seedPointPulse 2.4s ease-in-out infinite;
+  pointer-events:auto;
+  cursor:pointer;
+}
+
+.seed-map-point::after{
+  content:"";
+  position:absolute;
+  inset:4px;
+  border-radius:50%;
+  background:#fff8d6;
+}
+
+.seed-map-point .point-label{
+  position:absolute;
+  left:50%;
+  bottom:20px;
+  transform:translateX(-50%);
+  display:none;
+  white-space:nowrap;
+  padding:6px 10px;
+  border-radius:10px;
+  background:rgba(15,17,36,.94);
+  border:1px solid rgba(255,255,255,.18);
+  color:white;
+  font-family:'Nunito',sans-serif;
+  font-size:.72rem;
+  box-shadow:0 6px 18px rgba(0,0,0,.35);
+}
+
+.seed-map-point:hover .point-label{
+  display:block;
+}
+
+@keyframes seedPointAppear{
+  from{
+    opacity:0;
+    transform:translate(-50%,-50%) scale(0);
+  }
+  65%{
+    transform:translate(-50%,-50%) scale(1.35);
+  }
+  to{
+    opacity:1;
+    transform:translate(-50%,-50%) scale(1);
+  }
+}
+
+@keyframes seedPointPulse{
+  0%,100%{
+    box-shadow:
+      0 0 7px 2px rgba(247,220,131,.9),
+      0 0 14px 5px rgba(247,220,131,.25);
+  }
+  50%{
+    box-shadow:
+      0 0 10px 4px rgba(247,220,131,1),
+      0 0 26px 11px rgba(247,220,131,.42);
+  }
+}
+
+.map-privacy{
+  margin:16px 0 0;
+  font-size:.78rem;
+  opacity:.65;
+}
+
+.stat-inline{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:.95rem;
+  flex-wrap:wrap;
+}
+
+.stat-inline strong{
+  font-size:1.8rem;
+  color:var(--gold);
+}
+
+.live-dot{
+  color:var(--sage);
+  font-size:.75rem;
+}
+
+/* Estadísticas */
+.donut-row{display:flex; gap:24px; align-items:center; flex-wrap:wrap; margin:16px 0;}
+
+.donut{
+  width:150px;
+  height:150px;
+  border-radius:50%;
+  flex:0 0 auto;
+  background:conic-gradient(
+    var(--pink) 0% 25%,
+    var(--gold) 25% 45%,
+    var(--lavender) 45% 60%,
+    var(--blue-grey) 60% 75%,
+    var(--olive) 75% 85%,
+    var(--coral) 85% 93%,
+    var(--white-flower) 93% 100%);
+  position:relative;
+}
+
+.donut::after{
+  content:"";
+  position:absolute;
+  inset:22px;
+  border-radius:50%;
+  background:var(--night-2);
+}
+
+.donut-legend{list-style:none; padding:0; margin:0; font-size:.85rem; flex:1 1 180px;}
+.donut-legend li{display:flex; align-items:center; gap:8px; margin:6px 0;}
+.legend-dot{width:11px; height:11px; border-radius:50%; display:inline-block;}
+.ally-row{display:flex; gap:10px; flex-wrap:wrap;}
+
+.ally-badge{
+  background:rgba(247,236,216,.08);
+  border:1px solid var(--panel-border);
+  border-radius:999px;
+  padding:6px 14px;
+  font-size:.8rem;
+}
+
+/* Navegación inferior */
+.bottom-nav{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  z-index:5;
+  display:none;
+  background:rgba(15,17,36,.88);
+  backdrop-filter:blur(8px);
+  border-top:1px solid var(--panel-border);
+  justify-content:space-around;
+  padding:8px 4px 10px;
+}
+
+body.in-garden .bottom-nav{display:flex;}
+
+.nav-btn{
+  background:none;
+  border:none;
+  color:var(--cream);
+  opacity:.55;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:2px;
+  font-size:.68rem;
+  font-family:'Nunito',sans-serif;
+  cursor:pointer;
+  padding:4px 8px;
+}
+
+.nav-btn svg{width:20px; height:20px; fill:currentColor;}
+.nav-btn.active{opacity:1; color:var(--gold);}
+
+/* Control de audio */
+.audio-control{
+  position:fixed;
+  right:18px;
+  top:18px;
+  z-index:20;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 14px;
+  border:1px solid rgba(255,255,255,.22);
+  border-radius:999px;
+  background:rgba(15,17,36,.76);
+  color:#fff;
+  font-family:'Nunito',sans-serif;
+  font-size:.85rem;
+  cursor:pointer;
+  backdrop-filter:blur(8px);
+  box-shadow:0 6px 18px rgba(0,0,0,.22);
+}
+
+.audio-control:hover{background:rgba(15,17,36,.92);}
+.audio-control .audio-icon{font-size:1.05rem;}
+
+/* Modal */
+.modal-backdrop{
+  position:fixed;
+  inset:0;
+  z-index:10;
+  background:rgba(10,10,20,.75);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  backdrop-filter:blur(3px);
+}
+
+.modal-backdrop.hidden{display:none;}
+
+.modal-card{
+  background:var(--night-2);
+  border:1px solid var(--panel-border);
+  border-radius:var(--radius-lg);
+  padding:30px 24px;
+  max-width:380px;
+  width:100%;
+  text-align:center;
+  position:relative;
+}
+
+.modal-text{font-size:1.1rem; line-height:1.5;}
+.modal-meta{opacity:.65; font-size:.8rem;}
+
+@media (max-width:480px){
+  .panel{padding:26px 18px;}
+  .hero{transform:translateY(80px);}
+  .audio-control{
+    right:10px;
+    top:10px;
+    padding:9px 11px;
+  }
+  .audio-control .audio-text{display:none;}
+}
+</style>
+</head>
+
+<body>
+  <div class="night-sky" id="nightSky" aria-hidden="true">
+    <div class="stars"></div>
+    <div class="fireflies" id="fireflies"></div>
+  </div>
+
+  <div class="garden-transition" id="gardenTransition" aria-hidden="true"></div>
+
+  <audio id="ambientAudio" loop preload="auto">
+    <source src="sonido-ambiental.mp3" type="audio/mpeg">
+    Tu navegador no soporta audio HTML5.
+  </audio>
+
+  <button class="audio-control" id="audioToggle" type="button" aria-label="Activar o desactivar sonido ambiental">
+    <span class="audio-icon" id="audioIcon">🔇</span>
+    <span class="audio-text" id="audioText">Activar ambiente</span>
+  </button>
+
+  <nav class="bottom-nav" id="bottomNav">
+    <button class="nav-btn" data-view="inicio" aria-label="Inicio">
+      <svg viewBox="0 0 24 24"><path d="M12 3l9 8h-3v9h-5v-6H11v6H6v-9H3z"/></svg>
+      <span>Inicio</span>
+    </button>
+    <button class="nav-btn" data-view="sembrar" aria-label="Sembrar">
+      <svg viewBox="0 0 24 24"><path d="M12 2c-3 3-3 7 0 10 3-3 3-7 0-10zM4 14c4 0 8 3 8 8-4 0-8-3-8-8zM20 14c-4 0-8 3-8 8 4 0 8-3 8-8z"/></svg>
+      <span>Sembrar</span>
+    </button>
+    <button class="nav-btn" data-view="explorar" aria-label="Explorar">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" stroke-width="2"/></svg>
+      <span>Explorar</span>
+    </button>
+    <button class="nav-btn" data-view="mapa" aria-label="Mapa">
+      <svg viewBox="0 0 24 24"><path d="M12 2C7.6 2 4 5.6 4 10c0 6 8 12 8 12s8-6 8-12c0-4.4-3.6-8-8-8zm0 11a3 3 0 110-6 3 3 0 010 6z"/></svg>
+      <span>Mapa</span>
+    </button>
+    <button class="nav-btn" data-view="impacto" aria-label="Impacto">
+      <svg viewBox="0 0 24 24"><path d="M12 2l2.5 6.5L21 9l-5 4.5L17.5 21 12 17l-5.5 4L8 13.5 3 9l6.5-.5z"/></svg>
+      <span>Yo</span>
+    </button>
+  </nav>
+
+  <section class="view active" id="view-inicio" data-view="inicio">
+    <div class="hero">
+      <p class="hero-tag">Siembra lo que no pudiste decir.</p>
+      <button class="btn btn-primary" id="btnEntrarJardin" type="button">Entrar al jardín</button>
+      <button class="btn btn-link" data-goto="acerca" type="button">Conoce el proyecto ↓</button>
+    </div>
+  </section>
+
+  <section class="view" id="view-acerca" data-view="acerca">
+    <div class="panel">
+      <button class="btn-back" data-goto="inicio" type="button">←</button>
+      <h2>¿Qué es Jardín de Confesiones?</h2>
+      <p class="lead">Un espacio anónimo para expresar lo que llevas dentro. Cada confesión se convierte en una semilla que crece y florece junto a otras y, como propuesta de campaña, puede vincularse con acciones reales de reforestación.</p>
+
+      <div class="card-row">
+        <div class="info-card">
+          <span class="info-icon">🔒</span>
+          <h3>Anónimo</h3>
+          <p>Tu identidad siempre está protegida. Nunca se pide nombre para confesar.</p>
+        </div>
+        <div class="info-card">
+          <span class="info-icon">🤍</span>
+          <h3>Seguro</h3>
+          <p>Un lugar libre de juicios. Solo tú decides qué compartir.</p>
+        </div>
+        <div class="info-card">
+          <span class="info-icon">🌱</span>
+          <h3>Colectivo</h3>
+          <p>Juntos hacemos crecer este jardín y sus metas ambientales.</p>
+        </div>
+      </div>
+
+      <h3 class="section-sub">Reglas del jardín</h3>
+      <ul class="rules">
+        <li>Toda confesión es anónima por defecto.</li>
+        <li>No publiques nombres, amenazas ni datos personales.</li>
+        <li>Cada confesión se etiqueta con una emoción, representada por una flor.</li>
+        <li>Las metas ambientales se presentan como parte de una campaña-prototipo.</li>
+      </ul>
+
+      <button class="btn btn-primary" data-goto="sembrar" type="button">Sembrar una confesión</button>
+    </div>
+  </section>
+
+  <section class="view" id="view-sembrar" data-view="sembrar">
+    <div class="panel step" id="step-pregunta">
+      <h2>Para empezar, piensa en esto…</h2>
+      <div class="prompt-bubble" id="promptQuestion">¿Qué nunca te atreviste a decir?</div>
+      <button class="btn btn-ghost" id="btnCambiarPregunta" type="button">↻ Cambiar pregunta</button>
+      <button class="btn btn-primary" id="btnContinuarEscribir" type="button">Continuar</button>
+    </div>
+
+    <div class="panel step hidden" id="step-escribir">
+      <h2>Escribe tu confesión <span class="muted">(anónimo)</span></h2>
+      <textarea id="confesionTexto" placeholder="Escribe aquí…" maxlength="280"></textarea>
+      <p class="char-count"><span id="charCount">0</span>/280</p>
+
+      <h3 class="section-sub">¿Con qué emoción se relaciona?</h3>
+      <div class="emotion-picker" id="emotionPicker"></div>
+
+      <button class="btn btn-primary" id="btnPlantar" type="button" disabled>Plantar semilla</button>
+    </div>
+
+    <div class="panel step hidden" id="step-siembra">
+      <img src="plantar-semilla.png" class="seed-animation" alt="Semilla sembrándose">
+      <h2>Tu confesión se está sembrando…</h2>
+      <p class="lead">Gracias por confiar en este jardín. 🤍</p>
+      <button class="btn btn-primary" data-goto="explorar" type="button">Ver el jardín colectivo</button>
+      <button class="btn btn-link" id="btnOtraConfesion" type="button">Sembrar otra confesión</button>
+    </div>
+  </section>
+
+  <section class="view" id="view-explorar" data-view="explorar">
+    <div class="panel wide">
+      <h2>Jardín colectivo</h2>
+      <p class="lead">Explora las confesiones que otras personas han sembrado.</p>
+      <div class="filter-row" id="filterRow"></div>
+      <div class="confession-grid" id="confessionGrid"></div>
+    </div>
+  </section>
+
+  <section class="view" id="view-mapa" data-view="mapa">
+    <div class="panel wide">
+      <h2>Mapa de confesiones plantadas</h2>
+
+      <p class="lead muted">
+        Simulación en tiempo real: cada punto representa una semilla sembrada en una ubicación aproximada de México.
+      </p>
+
+      <div class="map-box">
+        <div
+          class="mexico-map-container"
+          id="mexicoMap"
+          aria-label="Mapa de México con semillas sembradas"
+        >
+          <img
+            src="silueta-mexico.png"
+            class="mexico-map-image"
+            alt="Silueta de México"
+          >
+
+          <div class="map-points" id="mapPoints"></div>
+        </div>
+      </div>
+
+      <div class="stat-inline">
+        <span>Semillas sembradas</span>
+        <strong id="seedCounter">8,432</strong>
+        <span class="live-dot">● simulación en tiempo real</span>
+      </div>
+
+      <p class="map-privacy">
+        Las ubicaciones son aproximadas para conservar el anonimato.
+      </p>
+    </div>
+  </section>
+
+  <section class="view" id="view-impacto" data-view="impacto">
+    <div class="panel wide">
+      <h2>Árbol emocional</h2>
+      <p class="lead muted">Distribución de emociones en todas las confesiones sembradas.</p>
+
+      <div class="donut-row">
+        <div class="donut" id="emotionDonut"></div>
+        <ul class="donut-legend" id="donutLegend"></ul>
+      </div>
+
+      <h2 class="mt">Nuestro impacto juntos</h2>
+      <div class="card-row">
+        <div class="stat-card">
+          <strong id="statSemillas">8,432</strong>
+          <span>Semillas plantadas</span>
+        </div>
+        <div class="stat-card">
+          <strong>3,120</strong>
+          <span>Árboles que podríamos plantar</span>
+        </div>
+        <div class="stat-card">
+          <strong>10,000</strong>
+          <span>Meta colectiva 🌳</span>
+        </div>
+      </div>
+
+      <h3 class="section-sub">Organizaciones aliadas (referencia)</h3>
+      <div class="ally-row">
+        <span class="ally-badge">Reforestemos</span>
+        <span class="ally-badge">Bosques del Mañana</span>
+        <span class="ally-badge">EcoVida</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="modal-backdrop hidden" id="confessionModal">
+    <div class="modal-card">
+      <button class="btn-back" id="closeModal" type="button">←</button>
+      <div class="modal-flower" id="modalFlower"></div>
+      <p class="modal-text" id="modalText"></p>
+      <p class="modal-meta"><span id="modalEmotion"></span> · <span id="modalTime"></span></p>
+    </div>
+  </div>
+
+<script>
+const EMOTIONS = [
+  {id:'amor',label:'Amor',image:'amor.png',color:'var(--pink)',pct:25},
+  {id:'esperanza',label:'Esperanza',image:'esperanza.png',color:'var(--gold)',pct:20},
+  {id:'nostalgia',label:'Nostalgia',image:'nostalgia.png',color:'var(--lavender)',pct:15},
+  {id:'tristeza',label:'Tristeza',image:'tristeza.png',color:'var(--blue-grey)',pct:15},
+  {id:'ansiedad',label:'Ansiedad',image:'ansiedad.png',color:'var(--olive)',pct:10},
+  {id:'culpa',label:'Culpa',image:'culpa.png',color:'var(--coral)',pct:8},
+  {id:'ira',label:'Ira',image:'ira.png',color:'#c9584a',pct:0},
+  {id:'paz',label:'Paz',image:'paz.png',color:'var(--white-flower)',pct:7}
+];
+
+const emotionById = id => EMOTIONS.find(e => e.id === id);
+
+function flowerImage(emotion,className=''){
+  return `<img src="${emotion.image}" alt="Flor de ${emotion.label}" class="emotion-flower ${className}">`;
+}
+
+let confessions = [
+  {text:'Extraño a la persona que era antes de que todo cambiara.',emotion:'nostalgia',time:'Hace 2 días'},
+  {text:'Nunca le dije lo mucho que significó para mí esa amistad.',emotion:'amor',time:'Hace 5 horas'},
+  {text:'Tengo miedo de decepcionar a todos si dejo la carrera.',emotion:'ansiedad',time:'Hace 1 día'},
+  {text:'Sigo esperando que algún día me busque otra vez.',emotion:'esperanza',time:'Hace 3 días'},
+  {text:'A veces siento que finjo estar bien todo el tiempo.',emotion:'tristeza',time:'Hace 6 horas'},
+  {text:'No perdoné a tiempo y ahora ya no hay forma de decirlo.',emotion:'culpa',time:'Hace 4 días'},
+  {text:'Estoy orgullosa de lo lejos que he llegado sola.',emotion:'paz',time:'Hace 12 horas'},
+  {text:'Odié que se rieran de mí, todavía lo recuerdo.',emotion:'ira',time:'Hace 2 días'}
+];
+
+const PROMPTS = [
+  '¿Qué nunca te atreviste a decir?',
+  '¿Qué extrañas y no lo dices en voz alta?',
+  '¿Qué te gustaría perdonarte hoy?',
+  '¿A quién le debes una verdad?',
+  '¿Qué sientes que nadie más entiende?',
+  '¿Qué esperanza sigues cargando en secreto?'
+];
+
+let promptIndex = 0;
+const GARDEN_VIEWS = ['sembrar','explorar','mapa','impacto'];
+
+function goto(view){
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(`view-${view}`).classList.add('active');
+
+  const dentroDelJardin = GARDEN_VIEWS.includes(view);
+  document.body.classList.toggle('in-garden',dentroDelJardin);
+  document.body.classList.remove('fondo-inicio','fondo-jardin');
+
+  if(view === 'inicio' || view === 'acerca'){
+    document.body.classList.add('fondo-inicio');
+  }else{
+    document.body.classList.add('fondo-jardin');
+  }
+
+  document.querySelectorAll('.nav-btn').forEach(b =>
+    b.classList.toggle('active',b.dataset.view === view)
+  );
+
+  window.scrollTo({top:0,behavior:'smooth'});
+
+  if(view === 'sembrar') resetSembrarFlow();
+}
+
+document.querySelectorAll('[data-goto]').forEach(btn =>
+  btn.addEventListener('click',() => goto(btn.dataset.goto))
+);
+
+document.querySelectorAll('.nav-btn').forEach(btn =>
+  btn.addEventListener('click',() => goto(btn.dataset.view))
+);
+
+/* Audio ambiental */
+const ambientAudio = document.getElementById('ambientAudio');
+const audioToggle = document.getElementById('audioToggle');
+const audioIcon = document.getElementById('audioIcon');
+const audioText = document.getElementById('audioText');
+
+ambientAudio.volume = 0.35;
+
+function updateAudioButton(){
+  const sounding = !ambientAudio.paused && !ambientAudio.muted;
+  audioIcon.textContent = sounding ? '🔊' : '🔇';
+  audioText.textContent = sounding ? 'Apagar ambiente' : 'Activar ambiente';
+  audioToggle.setAttribute('aria-pressed',String(sounding));
+}
+
+async function startAmbientAudio(){
+  try{
+    ambientAudio.muted = false;
+    await ambientAudio.play();
+  }catch(error){
+    console.warn('El navegador no permitió iniciar el audio:',error);
+  }
+  updateAudioButton();
+}
+
+audioToggle.addEventListener('click',async() => {
+  if(ambientAudio.paused){
+    await startAmbientAudio();
+  }else{
+    ambientAudio.pause();
+    updateAudioButton();
+  }
+});
+
+/* Entrada con luz durante 2 segundos */
+const btnEntrarJardin = document.getElementById('btnEntrarJardin');
+const gardenTransition = document.getElementById('gardenTransition');
+let transitionRunning = false;
+
+btnEntrarJardin.addEventListener('click',async() => {
+  if(transitionRunning) return;
+  transitionRunning = true;
+
+  await startAmbientAudio();
+
+  gardenTransition.classList.remove('active');
+  void gardenTransition.offsetWidth;
+  gardenTransition.classList.add('active');
+
+  setTimeout(() => {
+    goto('explorar');
+  },1600);
+
+  setTimeout(() => {
+    gardenTransition.classList.remove('active');
+    transitionRunning = false;
+  },2000);
+});
+
+/* Flujo de siembra */
+const stepPregunta = document.getElementById('step-pregunta');
+const stepEscribir = document.getElementById('step-escribir');
+const stepSiembra = document.getElementById('step-siembra');
+const promptQuestion = document.getElementById('promptQuestion');
+const confesionTexto = document.getElementById('confesionTexto');
+const charCount = document.getElementById('charCount');
+const emotionPicker = document.getElementById('emotionPicker');
+const btnPlantar = document.getElementById('btnPlantar');
+let selectedEmotion = null;
+
+function resetSembrarFlow(){
+  stepPregunta.classList.remove('hidden');
+  stepEscribir.classList.add('hidden');
+  stepSiembra.classList.add('hidden');
+  confesionTexto.value = '';
+  charCount.textContent = '0';
+  selectedEmotion = null;
+  renderEmotionPicker();
+  btnPlantar.disabled = true;
+}
+
+function renderEmotionPicker(){
+  emotionPicker.innerHTML = EMOTIONS.map(e => `
+    <div class="emotion-chip" data-emotion="${e.id}">
+      ${flowerImage(e)}
+      <span>${e.label}</span>
+    </div>
+  `).join('');
+
+  emotionPicker.querySelectorAll('.emotion-chip').forEach(chip =>
+    chip.addEventListener('click',() => {
+      selectedEmotion = chip.dataset.emotion;
+      emotionPicker.querySelectorAll('.emotion-chip').forEach(c => c.classList.remove('selected'));
+      chip.classList.add('selected');
+      btnPlantar.disabled = confesionTexto.value.trim().length === 0;
+    })
+  );
+}
+
+document.getElementById('btnCambiarPregunta').addEventListener('click',() => {
+  promptIndex = (promptIndex + 1) % PROMPTS.length;
+  promptQuestion.textContent = PROMPTS[promptIndex];
+});
+
+document.getElementById('btnContinuarEscribir').addEventListener('click',() => {
+  stepPregunta.classList.add('hidden');
+  stepEscribir.classList.remove('hidden');
+});
+
+confesionTexto.addEventListener('input',() => {
+  charCount.textContent = confesionTexto.value.length;
+  btnPlantar.disabled = confesionTexto.value.trim().length === 0 || !selectedEmotion;
+});
+
+/* Explorar */
+const filterRow = document.getElementById('filterRow');
+const confessionGrid = document.getElementById('confessionGrid');
+let activeFilter = 'todas';
+
+function renderFilters(){
+  const chips = [{id:'todas',label:'Todas'},...EMOTIONS.map(e => ({id:e.id,label:e.label}))];
+
+  filterRow.innerHTML = chips.map(c =>
+    `<span class="filter-chip ${c.id===activeFilter?'active':''}" data-filter="${c.id}">${c.label}</span>`
+  ).join('');
+
+  filterRow.querySelectorAll('.filter-chip').forEach(chip =>
+    chip.addEventListener('click',() => {
+      activeFilter = chip.dataset.filter;
+      renderFilters();
+      renderConfessionGrid();
+    })
+  );
+}
+
+function renderConfessionGrid(){
+  const list = activeFilter === 'todas'
+    ? confessions
+    : confessions.filter(c => c.emotion === activeFilter);
+
+  confessionGrid.innerHTML = list.map(c => {
+    const e = emotionById(c.emotion);
+    return `
+      <div class="confession-card" data-index="${confessions.indexOf(c)}">
+        ${flowerImage(e,'card-flower')}
+        <p>${c.text}</p>
+      </div>
+    `;
+  }).join('') || `<p class="muted">Aún no hay confesiones con esta emoción.</p>`;
+
+  confessionGrid.querySelectorAll('.confession-card').forEach(card =>
+    card.addEventListener('click',() => openModal(confessions[card.dataset.index]))
+  );
+}
+
+/* Modal */
+const modal = document.getElementById('confessionModal');
+
+function openModal(c){
+  const e = emotionById(c.emotion);
+  document.getElementById('modalFlower').innerHTML = flowerImage(e,'modal-flower-image');
+  document.getElementById('modalText').textContent = c.text;
+  document.getElementById('modalEmotion').textContent = e.label;
+  document.getElementById('modalTime').textContent = c.time;
+  modal.classList.remove('hidden');
+}
+
+document.getElementById('closeModal').addEventListener('click',() => modal.classList.add('hidden'));
+modal.addEventListener('click',e => {
+  if(e.target === modal) modal.classList.add('hidden');
+});
+
+/* Mapa simulado */
+const mapPoints = document.getElementById('mapPoints');
+
+const MEXICO_LOCATIONS = [
+  {city:'Tijuana', state:'Baja California', x:11, y:28},
+  {city:'Hermosillo', state:'Sonora', x:25, y:31},
+  {city:'Chihuahua', state:'Chihuahua', x:39, y:31},
+  {city:'Monterrey', state:'Nuevo León', x:57, y:36},
+  {city:'Culiacán', state:'Sinaloa', x:34, y:45},
+  {city:'Durango', state:'Durango', x:45, y:45},
+  {city:'San Luis Potosí', state:'San Luis Potosí', x:58, y:50},
+  {city:'Guadalajara', state:'Jalisco', x:49, y:59},
+  {city:'León', state:'Guanajuato', x:57, y:57},
+  {city:'Querétaro', state:'Querétaro', x:62, y:59},
+  {city:'Ciudad de México', state:'Ciudad de México', x:65, y:65},
+  {city:'Puebla', state:'Puebla', x:69, y:66},
+  {city:'Veracruz', state:'Veracruz', x:74, y:61},
+  {city:'Acapulco', state:'Guerrero', x:62, y:73},
+  {city:'Oaxaca', state:'Oaxaca', x:72, y:74},
+  {city:'Tuxtla Gutiérrez', state:'Chiapas', x:83, y:75},
+  {city:'Villahermosa', state:'Tabasco', x:84, y:67},
+  {city:'Mérida', state:'Yucatán', x:92, y:56},
+  {city:'Cancún', state:'Quintana Roo', x:96, y:61}
+];
+
+const mapEmotionColors = {
+  amor:'#f3a9bd',
+  esperanza:'#f3d46f',
+  nostalgia:'#bca7ee',
+  tristeza:'#8fb1df',
+  ansiedad:'#a7b852',
+  culpa:'#ed8a70',
+  ira:'#d85b4b',
+  paz:'#f5f0d7'
+};
+
+function randomMexicoLocation(){
+  const index = Math.floor(Math.random() * MEXICO_LOCATIONS.length);
+  return MEXICO_LOCATIONS[index];
+}
+
+function addSeedPointToMap(location = randomMexicoLocation(), emotion = null){
+  const point = document.createElement('div');
+
+  point.className = 'seed-map-point';
+  point.style.left = `${location.x}%`;
+  point.style.top = `${location.y}%`;
+
+  if(emotion && mapEmotionColors[emotion]){
+    const color = mapEmotionColors[emotion];
+
+    point.style.background = color;
+    point.style.boxShadow = `
+      0 0 8px 3px ${color},
+      0 0 20px 8px ${color}66
+    `;
+  }
+
+  point.setAttribute(
+    'aria-label',
+    `Semilla sembrada cerca de ${location.city}, ${location.state}`
+  );
+
+  point.title = `${location.city}, ${location.state}`;
+
+  point.innerHTML = `
+    <span class="point-label">
+      ${location.city}, ${location.state}
+    </span>
+  `;
+
+  mapPoints.appendChild(point);
+
+  if(mapPoints.children.length > 80){
+    mapPoints.removeChild(mapPoints.firstElementChild);
+  }
+}
+
+for(let i = 0; i < 14; i++){
+  const emotion =
+    EMOTIONS[
+      Math.floor(Math.random() * EMOTIONS.length)
+    ].id;
+
+  addSeedPointToMap(
+    randomMexicoLocation(),
+    emotion
+  );
+}
+
+/* Contador */
+let seedTotal = 8432;
+const seedCounterEl = document.getElementById('seedCounter');
+const statSemillasEl = document.getElementById('statSemillas');
+
+function bumpSeedCounter(n){
+  seedTotal += n;
+  seedCounterEl.textContent = seedTotal.toLocaleString('es-MX');
+  statSemillasEl.textContent = seedTotal.toLocaleString('es-MX');
+}
+
+bumpSeedCounter(0);
+
+/* Plantar confesión + agregar punto al mapa */
+btnPlantar.addEventListener('click',() => {
+  confessions.unshift({
+    text:confesionTexto.value.trim(),
+    emotion:selectedEmotion,
+    time:'Justo ahora'
+  });
+
+  const newLocation = randomMexicoLocation();
+
+  addSeedPointToMap(
+    newLocation,
+    selectedEmotion
+  );
+
+  bumpSeedCounter(1);
+
+  stepEscribir.classList.add('hidden');
+  stepSiembra.classList.remove('hidden');
+
+  renderConfessionGrid();
+});
+
+document.getElementById('btnOtraConfesion').addEventListener('click',resetSembrarFlow);
+
+/* Simulación: aparece una semilla cada 5 segundos */
+setInterval(() => {
+  const randomEmotion =
+    EMOTIONS[
+      Math.floor(Math.random() * EMOTIONS.length)
+    ].id;
+
+  addSeedPointToMap(
+    randomMexicoLocation(),
+    randomEmotion
+  );
+
+  bumpSeedCounter(1);
+},5000);
+
+/* Leyenda */
+const donutLegend = document.getElementById('donutLegend');
+
+donutLegend.innerHTML = EMOTIONS
+  .filter(e => e.pct > 0)
+  .map(e => `<li><span class="legend-dot" style="background:${e.color}"></span>${e.label} — ${e.pct}%</li>`)
+  .join('');
+
+/* Luciérnagas */
+const fireflyBox = document.getElementById('fireflies');
+
+for(let i=0;i<24;i++){
+  const f = document.createElement('div');
+  f.className = 'firefly';
+  f.style.left = Math.random()*100 + 'vw';
+  f.style.top = Math.random()*100 + 'vh';
+  f.style.animationDelay = (Math.random()*6) + 's, ' + (Math.random()*3) + 's';
+  fireflyBox.appendChild(f);
+}
+
+/* Inicio */
+renderFilters();
+renderConfessionGrid();
+updateAudioButton();
+goto('inicio');
+</script>
+</body>
+</html>
